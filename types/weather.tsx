@@ -3,7 +3,7 @@ export interface WeatherData {
     name:string,
     main:{
         temp:number,
-        huminity:number,
+        humidity:number,
         feels_like:number
     },
     weather: Array<{
@@ -13,5 +13,9 @@ export interface WeatherData {
     }>,
     wind: {
         speed:number
-    }
+    },
+    sys: {
+        sunrise:number,
+        sunset:number
+    },
 }

@@ -5,23 +5,36 @@ import {Droplets, Search, Wind,Thermometer} from "lucide-react"
 import { getWeatherData } from "./action";
 import { useState } from "react";
 import { WeatherData } from "../../types/weather";
-import { Card, CardContent} from "@/components/ui/card"
-import { error } from "console";
+import { Card, CardContent} from "@/components/ui/card";
 import { useFormStatus } from "react-dom";
 
 function SubmitBtn (){
   const {pending} = useFormStatus();
+
   return(
     <Button className="rounded-full bg-blue-50 text-blue-600 cursor-pointer" type="submit" disabled={pending}>
       <Search className="w-4 h-4 my-1"/>
+
     </Button>
   )
+}
+function translateWeatherDescription(description: string): string {
+  const translations:{[key:string]: string} = {
+    "clear sky": "Цэлмэг тэнгэр",
+    "few clouds": "Бага зэрэг үүлэрхэг",
+    "scattered clouds": "Тарсан үүлтэй",
+    "broken clouds": "Үүлэрхэг",
+    "snow": "Цас",
+    "overcast clouds":"Үүлэрхэг"
+  }
+  return translations[description] || description;
 }
 export default function Home() {
 
   const [weather, setWeather] = useState<WeatherData | null> (null)
   const [city, setCity] = useState("Ulaanbaatar")
   const [error, setError] = useState("")
+  const sunrise = weather?.sys?.sunrise
 
   const handleSearch = async (formData:FormData) => {
     const city = formData.get("city") as string
@@ -61,13 +74,13 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="text-gray-500 mt-1 capitalize">
-                    {weather.weather[0].description}
+                    {translateWeatherDescription(weather.weather[0].description)}
                   </div>
                   </div>
                   <div className="grid grid-cols-3 gap-4 mt-6">
                     <div className="text-center">
                       <Thermometer className="w-6 h-6 mx-auto text-orange-500"/>
-                      <div className="mt-2 text-sm text-gray-500">Температур</div>
+                      <div className="mt-2 text-sm text-gray-500">М/температур</div>
                       <div className="font-semibold">
                       {Math.round(weather.main.feels_like)}<sup>o</sup>C
                       </div>
@@ -76,14 +89,39 @@ export default function Home() {
                       <Droplets className="w-6 h-6 mx-auto text-orange-500"/>
                       <div className="mt-2 text-sm text-gray-500">Чийгшил</div>
                       <div className="font-semibold">
-                      {Math.round(weather.main.huminity)}%
+                      {Math.round(weather.main.humidity)}%
                       </div>
                     </div>
                     <div className="text-center">
                       <Wind className="w-6 h-6 mx-auto text-orange-500"/>
                       <div className="mt-2 text-sm text-gray-500">Салхины хурд</div>
                       <div className="font-semibold">
-                      {Math.round(weather.main.temp)}м/с
+                      {Math.round(weather.wind.speed)}м/с
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 mt-6">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-500">Нар мандах цаг:</div>
+                      <div className="font-semibold">
+                      {sunrise ? (new Date(sunrise*1000).toLocaleTimeString("mn-MN", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })) : ("00:00")}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-gray-500"> Нар жаргах цаг:
+                      </div>
+                      <div className="font-semibold">
+                        {
+                          weather?.sys?.sunset ? (
+                            new Date(weather.sys.sunset*1000).toLocaleTimeString("mn-MN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          ):("00:00")
+                        }
                       </div>
                     </div>
                   </div>

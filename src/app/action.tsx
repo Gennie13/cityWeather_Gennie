@@ -7,14 +7,17 @@ export async function getWeatherData(city:string): Promise<{
     error?: string
     }> {
     try {
-        if(!city.trim())
+        if(!city.trim()){
             return {error: "Хайх нэрээ оруулна уу..."}
+        }
+            
         const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${process.env.OPENWEATHER_API_KEY}`)
+        
         if(!res.ok) {
-            const errorData = await res.json()
             return {error: "Нэрээ дахиж оруулна уу..."}
         }
         const data:WeatherData = await res.json();
+        console.log(data)
         return {data}
         
     } catch(err) {
